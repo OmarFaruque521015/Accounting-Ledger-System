@@ -2,12 +2,12 @@
 using Infrastructure.Features.Accounts.Handlers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Win32;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Validators;
-using FluentValidation;
-using FluentValidation.AspNetCore;
+using Infrastructure.Features.Accounts.Command;
+using Infrastructure.Features.Accounts.Queries;
+using AccountingLedgerSystem.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,13 +20,15 @@ builder.Services.AddCors(options =>
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddApplicationPart(typeof(AccountController).Assembly);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Register MediatR
 builder.Services.AddMediatR(typeof(AddAccountHandler).Assembly);
+builder.Services.AddMediatR(typeof(AddJournalEntryHandler).Assembly);
+builder.Services.AddMediatR(typeof(GetAccountsCommandHandler).Assembly);
 
 // Register FluentValidation
 builder.Services.AddFluentValidationAutoValidation();

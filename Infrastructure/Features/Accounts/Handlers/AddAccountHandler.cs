@@ -1,45 +1,40 @@
-﻿using Core.DTOs;
-using Infrastructure.Features.Accounts.Queries;
-using Infrastructure;
+﻿using Infrastructure.Features.Accounts.Command;
 using MediatR;
 using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Data;
+using Microsoft.EntityFrameworkCore;
 
-namespace Application.Features.Accounts.Handlers;
+namespace Infrastructure.Features.Accounts.Handlers;
 
-public class GetAccountsHandler : IRequestHandler<GetAccountsCommand, List<AccountDto>>
+public class AddAccountHandler : IRequestHandler<AddAccountCommand, int>
 {
     private readonly ApplicationDbContext _context;
+    private readonly IConfiguration _config;
 
-    public GetAccountsHandler(ApplicationDbContext context)
+    public AddAccountHandler(ApplicationDbContext context, IConfiguration config)
     {
         _context = context;
+        _config = config;
     }
 
-    public async Task<List<AccountDto>> Handle(GetAccountsCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(AddAccountCommand request, CancellationToken cancellationToken)
     {
-        var accounts = new List<AccountDto>();
+        var parameters = new[]
+        {
+            new SqlParameter("@Name", SqlDbType.NVarChar) { Value = request.Account.Name },
+            new SqlParameter("@Type", SqlDbType.NVarChar) { Value = request.Account.Type }
+        };
 
         using var conn = _context.Database.GetDbConnection();
         await conn.OpenAsync(cancellationToken);
 
-        using var command = conn.CreateCommand();
-        command.CommandText = "sp_GetAccounts";
-        command.CommandType = CommandType.StoredProcedure;
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "sp_AddAccount";
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.Parameters.AddRange(parameters);
 
-        using var reader = await command.ExecuteReaderAsync();
-
-        while (await reader.ReadAsync())
-        {
-            accounts.Add(new AccountDto
-            {
-                Id = Convert.ToInt32(reader["Id"]),
-                Name = reader["Name"].ToString()!,
-                Type = reader["Type"].ToString()!
-            });
-        }
-
-        return accounts;
+        var result = await cmd.ExecuteScalarAsync(cancellationToken);
+        return Convert.ToInt32(result);
     }
 }

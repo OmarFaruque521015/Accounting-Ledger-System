@@ -17,14 +17,14 @@ namespace AccountingLedgerSystem.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet]
+        [HttpGet("get")]
         public async Task<IActionResult> Get()
         {
             var result = await _mediator.Send(new GetAccountsCommand());
             return Ok(result);
         }
 
-        [HttpPost]
+        [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] AccountDto accountDto)
         {
             var command = new AddAccountCommand { Account = accountDto };
