@@ -5,36 +5,49 @@ using Microsoft.Extensions.Configuration;
 using System.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Features.Accounts.Handlers;
-
-public class AddAccountHandler : IRequestHandler<AddAccountCommand, int>
+namespace Infrastructure.Features.Accounts.Handlers
 {
-    private readonly ApplicationDbContext _context;
-    private readonly IConfiguration _config;
-
-    public AddAccountHandler(ApplicationDbContext context, IConfiguration config)
+    public class AddAccountHandler : IRequestHandler<AddAccountCommand, int>
     {
-        _context = context;
-        _config = config;
-    }
+        private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _config;
 
-    public async Task<int> Handle(AddAccountCommand request, CancellationToken cancellationToken)
-    {
-        var parameters = new[]
+        public AddAccountHandler(ApplicationDbContext context, IConfiguration config)
         {
-            new SqlParameter("@Name", SqlDbType.NVarChar) { Value = request.Account.Name },
-            new SqlParameter("@Type", SqlDbType.NVarChar) { Value = request.Account.Type }
-        };
+            _context = context;
+            _config = config;
+        }
 
-        using var conn = _context.Database.GetDbConnection();
-        await conn.OpenAsync(cancellationToken);
+        public async Task<int> Handle(AddAccountCommand request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                // Prepare parameters
+                var parameters = new[]
+                {
+                    new SqlParameter("@Name", SqlDbType.NVarChar, 100) { Value = request.Account.Name },
+                    new SqlParameter("@Type", SqlDbType.NVarChar, 50) { Value = request.Account.Type }
+                };
 
-        using var cmd = conn.CreateCommand();
-        cmd.CommandText = "sp_AddAccount";
-        cmd.CommandType = CommandType.StoredProcedure;
-        cmd.Parameters.AddRange(parameters);
+                // Open the connection manually (ADO.NET-style)
+                using var conn = _context.Database.GetDbConnection();
+                await conn.OpenAsync(cancellationToken);
 
-        var result = await cmd.ExecuteScalarAsync(cancellationToken);
-        return Convert.ToInt32(result);
+                // Create and configure command
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = "sp_AddAccount";
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddRange(parameters);
+
+                // Execute and return the newly created Account ID
+                var result = await cmd.ExecuteScalarAsync(cancellationToken);
+                return Convert.ToInt32(result);
+            }
+            catch (SqlException ex)
+            {
+                // Optional: Log error here
+                throw new Exception("An error occurred while adding the account.", ex);
+            }
+        }
     }
 }

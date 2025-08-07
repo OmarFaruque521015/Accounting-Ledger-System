@@ -24,12 +24,47 @@ namespace AccountingLedgerSystem.Controllers
             return Ok(result);
         }
 
+        [HttpGet("get/{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var result = await _mediator.Send(new GetAccountByIdQuery { Id = id });
+            if (result == null)
+                return NotFound();
+            return Ok(result);
+        }
+
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] AccountDto accountDto)
         {
             var command = new AddAccountCommand { Account = accountDto };
             var result = await _mediator.Send(command);
             return Ok(result);
+        }
+
+        [HttpPut("update/{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] AccountDto accountDto)
+        {
+            var command = new UpdateAccountCommand
+            {
+                Id = id,
+                Account = accountDto
+            };
+
+            var result = await _mediator.Send(command);
+            if (!result)
+                return NotFound();
+
+            return Ok(new { message = "Account updated successfully." });
+        }
+
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _mediator.Send(new DeleteAccountCommand { Id = id });
+            if (!result)
+                return NotFound();
+
+            return Ok(new { message = "Account deleted successfully." });
         }
     }
 }

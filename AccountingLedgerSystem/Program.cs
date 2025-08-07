@@ -17,6 +17,13 @@ builder.Services.AddCors(options =>
         b => b.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
+//Connect with Angular project start
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular",
+        policy => policy.WithOrigins("http://localhost:4200/").AllowAnyMethod().AllowAnyHeader());
+});
+//Connect with Angular project End
 
 // Add services to the container.
 
@@ -48,9 +55,8 @@ if (app.Environment.IsDevelopment())
 }
 app.UseCors("CorsPlay");
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
+app.UseCors("AllowAngular");
 app.MapControllers();
 
 app.Run();
