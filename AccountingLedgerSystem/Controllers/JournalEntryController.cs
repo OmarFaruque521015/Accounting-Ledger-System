@@ -11,7 +11,7 @@ namespace AccountingLedgerSystem.Controllers
     [ApiController]
     public class JournalEntryController : ControllerBase
     {
-        private readonly IMediator _mediator;
+        private readonly IMediator _mediator; 
 
         public JournalEntryController(IMediator mediator)
         {
