@@ -10,5 +10,6 @@ namespace Infrastructure.Features.Accounts.Queries
 {
     public class GetJournalEntriesQuery : IRequest<List<JournalEntryViewDto>>
     {
+        public int Id { get; set; }
     }
 }

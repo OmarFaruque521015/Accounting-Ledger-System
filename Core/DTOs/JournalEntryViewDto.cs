@@ -8,9 +8,10 @@ namespace Core.DTOs
 {
     public class JournalEntryViewDto
     {
-        public int JournalEntryId { get; set; }
+        //public int JournalEntryId { get; set; }
+        public int Id { get; set; }
         public DateTime Date { get; set; }
         public string? Description { get; set; }
-        public List<JournalEntryLineViewDto> Lines { get; set; } = new();
+        //public List<JournalEntryLineViewDto> Lines { get; set; } = new();
     }
 }

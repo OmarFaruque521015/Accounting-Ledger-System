@@ -41,11 +41,21 @@ namespace Infrastructure.Features.Accounts.Handlers
 
                 // Execute and return the newly created Account ID
                 var result = await cmd.ExecuteScalarAsync(cancellationToken);
+
+                if (result == null || result == DBNull.Value)
+                {
+                    throw new Exception("Account already exists.");
+                }
+
                 return Convert.ToInt32(result);
             }
             catch (SqlException ex)
             {
-                // Optional: Log error here
+                if (ex.Message.Contains("already exists"))
+                {
+                    throw new Exception("Account already exists.", ex);
+                }
+
                 throw new Exception("An error occurred while adding the account.", ex);
             }
         }

@@ -18,7 +18,7 @@ namespace AccountingLedgerSystem.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost]
+        [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] JournalEntryDto dto)
         {
             var command = new AddJournalEntryCommand { Entry = dto };
@@ -26,11 +26,46 @@ namespace AccountingLedgerSystem.Controllers
             return Ok(new { Id = result });
         }
 
-        [HttpGet]
+        [HttpGet("getJournalEntry")]
         public async Task<IActionResult> Get()
         {
             var result = await _mediator.Send(new GetJournalEntriesQuery());
             return Ok(result);
+        }
+
+        [HttpGet("getJournalEntry/{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var result = await _mediator.Send(new GetAccountByIdQuery { Id = id });
+            if (result == null)
+                return NotFound();
+            return Ok(result);
+        }
+
+        [HttpPost("update/{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] JournalEntryDto dto)
+        {
+            var command = new UpdateJournalEntryCommand
+            {
+                Id = id,
+                JournalEntry = dto
+            };
+
+            var result = await _mediator.Send(command);
+            if (!result)
+                return NotFound();
+
+            return Ok(new { message = "Account updated successfully." });
+        }
+
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _mediator.Send(new DeleteAccountCommand { Id = id });
+            if (!result)
+                return NotFound();
+
+            return Ok(new { message = "Account deleted successfully." });
         }
     }
 }

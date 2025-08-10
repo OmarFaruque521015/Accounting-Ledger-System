@@ -35,21 +35,25 @@ namespace Infrastructure.Features.Accounts.Handlers
             cmd.Parameters.Add(new SqlParameter("@Description", SqlDbType.NVarChar, 255) { Value = request.Entry.Description ?? (object)DBNull.Value });
 
             var result = await cmd.ExecuteScalarAsync(cancellationToken);
+            if (result == null || result == DBNull.Value)
+            {
+                throw new Exception("Account Journal already exists.");
+            }
             entryId = Convert.ToInt32(result);
 
-            foreach (var line in request.Entry.Lines)
-            {
-                var insertLine = conn.CreateCommand();
-                insertLine.CommandText = @"
-                INSERT INTO JournalEntryLine (JournalEntryId, AccountId, Debit, Credit)
-                VALUES (@JournalEntryId, @AccountId, @Debit, @Credit)";
-                insertLine.Parameters.Add(new SqlParameter("@JournalEntryId", entryId));
-                insertLine.Parameters.Add(new SqlParameter("@AccountId", line.AccountId));
-                insertLine.Parameters.Add(new SqlParameter("@Debit", line.Debit));
-                insertLine.Parameters.Add(new SqlParameter("@Credit", line.Credit));
+            //foreach (var line in request.Entry.Lines)
+            //{
+            //    var insertLine = conn.CreateCommand();
+            //    insertLine.CommandText = @"
+            //    INSERT INTO JournalEntryLine (JournalEntryId, AccountId, Debit, Credit)
+            //    VALUES (@JournalEntryId, @AccountId, @Debit, @Credit)";
+            //    insertLine.Parameters.Add(new SqlParameter("@JournalEntryId", entryId));
+            //    insertLine.Parameters.Add(new SqlParameter("@AccountId", line.AccountId));
+            //    insertLine.Parameters.Add(new SqlParameter("@Debit", line.Debit));
+            //    insertLine.Parameters.Add(new SqlParameter("@Credit", line.Credit));
 
-                await insertLine.ExecuteNonQueryAsync(cancellationToken);
-            }
+            //    await insertLine.ExecuteNonQueryAsync(cancellationToken);
+            //}
 
             return entryId;
         }
