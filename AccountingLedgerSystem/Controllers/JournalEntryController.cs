@@ -61,7 +61,7 @@ namespace AccountingLedgerSystem.Controllers
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _mediator.Send(new DeleteAccountCommand { Id = id });
+            var result = await _mediator.Send(new DeleteJournalEntryCommand { Id = id });
             if (!result)
                 return NotFound();
 

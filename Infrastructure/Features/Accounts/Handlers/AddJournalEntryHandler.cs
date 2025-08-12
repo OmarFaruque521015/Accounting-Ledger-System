@@ -35,10 +35,7 @@ namespace Infrastructure.Features.Accounts.Handlers
             cmd.Parameters.Add(new SqlParameter("@Description", SqlDbType.NVarChar, 255) { Value = request.Entry.Description ?? (object)DBNull.Value });
 
             var result = await cmd.ExecuteScalarAsync(cancellationToken);
-            if (result == null || result == DBNull.Value)
-            {
-                throw new Exception("Account Journal already exists.");
-            }
+             
             entryId = Convert.ToInt32(result);
 
             //foreach (var line in request.Entry.Lines)

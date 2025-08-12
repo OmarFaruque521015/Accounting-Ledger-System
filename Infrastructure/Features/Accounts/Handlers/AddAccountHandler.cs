@@ -21,15 +21,7 @@ namespace Infrastructure.Features.Accounts.Handlers
         public async Task<int> Handle(AddAccountCommand request, CancellationToken cancellationToken)
         {
             try
-            {
-                // Prepare parameters
-                var parameters = new[]
-                {
-                    new SqlParameter("@Name", SqlDbType.NVarChar, 100) { Value = request.Account.Name },
-                    new SqlParameter("@Type", SqlDbType.NVarChar, 50) { Value = request.Account.Type }
-                };
-
-                // Open the connection manually (ADO.NET-style)
+            { 
                 using var conn = _context.Database.GetDbConnection();
                 await conn.OpenAsync(cancellationToken);
 
@@ -37,16 +29,12 @@ namespace Infrastructure.Features.Accounts.Handlers
                 using var cmd = conn.CreateCommand();
                 cmd.CommandText = "sp_AddAccount";
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddRange(parameters);
 
-                // Execute and return the newly created Account ID
+                cmd.Parameters.Add(new SqlParameter("@Name", request.Account.Name));
+                cmd.Parameters.Add(new SqlParameter("@Type", request.Account.Type));
+
                 var result = await cmd.ExecuteScalarAsync(cancellationToken);
-
-                if (result == null || result == DBNull.Value)
-                {
-                    throw new Exception("Account already exists.");
-                }
-
+                 
                 return Convert.ToInt32(result);
             }
             catch (SqlException ex)

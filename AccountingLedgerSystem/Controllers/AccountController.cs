@@ -41,7 +41,7 @@ namespace AccountingLedgerSystem.Controllers
             return Ok(result);
         }
 
-        [HttpPut("update/{id}")]
+        [HttpPost("update/{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] AccountDto accountDto)
         {
             var command = new UpdateAccountCommand
