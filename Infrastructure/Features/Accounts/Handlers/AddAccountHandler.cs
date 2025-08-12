@@ -25,7 +25,6 @@ namespace Infrastructure.Features.Accounts.Handlers
                 using var conn = _context.Database.GetDbConnection();
                 await conn.OpenAsync(cancellationToken);
 
-                // Create and configure command
                 using var cmd = conn.CreateCommand();
                 cmd.CommandText = "sp_AddAccount";
                 cmd.CommandType = CommandType.StoredProcedure;

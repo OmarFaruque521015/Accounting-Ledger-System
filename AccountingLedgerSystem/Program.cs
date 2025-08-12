@@ -1,13 +1,15 @@
-﻿using Infrastructure;
-using Infrastructure.Features.Accounts.Handlers;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
+﻿using AccountingLedgerSystem.Controllers;
+using Core.Interfaces;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Infrastructure.Validators;
+using Infrastructure;
 using Infrastructure.Features.Accounts.Command;
+using Infrastructure.Features.Accounts.Handlers;
 using Infrastructure.Features.Accounts.Queries;
-using AccountingLedgerSystem.Controllers;
+using Infrastructure.Services;
+using Infrastructure.Validators;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +33,9 @@ builder.Services.AddControllers().AddApplicationPart(typeof(AccountController).A
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//Add Infrastructure services
+builder.Services.AddScoped<IStoredProcedureService, StoredProcedureService>();
 
 // Register MediatR
 builder.Services.AddMediatR(typeof(AddAccountHandler).Assembly);

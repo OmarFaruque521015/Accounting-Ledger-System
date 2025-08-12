@@ -11,6 +11,6 @@ namespace Core
         public int Id { get; set; }
         public string Name { get; set; }=string.Empty;
         public string Type { get; set; } = string.Empty;
-        public ICollection<JournalEntryLine> journalEntryLines { get; set; }
+        //public ICollection<JournalEntryLine> journalEntryLines { get; set; }
     }
 }
